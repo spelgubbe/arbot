@@ -13,19 +13,18 @@ function getCommonSymbols(S1, S2)
 
   let smallestMap = s1Size < s2Size ? S1 : S2
   let biggestMap = s1Size < s2Size ? S2 : S1
-  let union = new Array()
+  let intersection = new Array()
 
   for (let key of smallestMap.keys())
   {
     if (biggestMap.has(key))
     {
-      union.push(key)
+      intersection.push(key)
     }
   }
 
-  return union
+  return intersection
 }
-
 // TODO: get common symbols but with variable number of maps
 
 function triangleArb()
@@ -63,36 +62,27 @@ function compareBooks(B1, B2, fee1, fee2)
   const lowestAsk1 = B1.asks[0].price
   const lowestAsk2 = B2.asks[0].price
 
-  // Effective buying price of a market buy on exchange 1 and exchange 2 respectively
-  const m1BuyRate = lowestAsk1*feeMult1
-  const m2BuyRate = lowestAsk2*feeMult2
+  const buy1sell2 = getProfitFraction(lowestAsk1, highestBid2, feeMult1, feeMult2)
+  const buy2sell1 = getProfitFraction(lowestAsk2, highestBid1, feeMult2, feeMult1)
 
-  // Effective selling price of a market buy on exchange 1 and exchange 2 respectively
-  const m1SellRate = highestBid1/feeMult1
-  const m2SellRate = highestBid2/feeMult2
-
-  // these cases are mutually exclusive
-
-  if (m1BuyRate < m2SellRate) // m1 buy, m2 sell
+  if (buy1sell2 > 0)
   {
-    let percentageGain = calcPercentageGain(m1BuyRate, m2SellRate)
-    return [true, percentageGain, {sell: 1, buy: 0}]
-  }
-
-  // possibility of buying at exchange 2 at market and selling on exchange 1 at market
-  else if (m2BuyRate < m1SellRate) // m2 buy, m1 sell
+    return [true, buy1sell2, {sell: 1, buy: 0}] // this is ugly
+  } else if (buy2sell1 > 0)
   {
-    let percentageGain = calcPercentageGain(m2BuyRate, m1SellRate)
-    return [true, percentageGain, {sell: 0, buy: 1}]
+    return [true, buy2sell1, {sell: 0, buy: 1}]
   }
+  return [false, buy1sell2, buy2sell1]
 
-  // TODO: add info which could help with, like at which price it would be profitable to arb
-  return [false, m1BuyRate, m2BuyRate, m1SellRate, m2SellRate]
 }
 
-function calcPercentageGain(buyPrice, sellPrice)
+function getProfitFraction(lowestAsk, highestBid, buyFee, sellFee)
 {
-  return (sellPrice - buyPrice) / buyPrice
+  const buyRate = lowestAsk*buyFee
+
+  const sellRate = highestBid/sellFee
+
+  return (sellRate - buyRate) / buyRate
 }
 
 module.exports = {getCommonSymbols, compareBooks}
