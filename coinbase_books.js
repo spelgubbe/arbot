@@ -34,10 +34,6 @@ const endpoint = "https://api.pro.coinbase.com"
 
 async function getProductSymbols()
 {
-  // BULL/BEAR contracts are listed in binance.prices(), not really a problem
-  // except that they cant be arbed probably (so have to be excluded)
-  //return await binance.prices()
-
   /* client.rest.product.getProducts() returns an array: Example of one element, 
     id: 'BCH-EUR',
     base_currency: 'BCH',
