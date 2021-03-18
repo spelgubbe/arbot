@@ -2,12 +2,56 @@ const fetch = require('node-fetch')
 const url = 'https://api-pub.bitfinex.com/v2/'
 // using public api
 
+const symbolMapPath = "conf/pub:map:currency:sym"
+const currencyPath = "conf/pub:list:currency"
+
+const customCurrencyMapping = {"REP2": "REP"}
+
+async function getTranslationList()
+{
+  const res = await request(symbolMapPath)
+  return res[0]
+}
+
+async function getTranslationMap()
+{
+  // A map to translate an internal representation of a currency to a common representation of a currency
+  // eg. UST => USDT
+  // eg. DSH => DASH
+  let map = new Map()
+  let translationTable = await getTranslationList()
+  for(let [internal, common] of translationTable)
+  {
+    if (common in customCurrencyMapping)
+    {
+      common = customCurrencyMapping[common] // eg. REP2 => REP
+    }
+    map.set(internal, common)
+  }
+  return map
+}
+
+async function getCurrencyList()
+{
+  const res = await request(currencyPath)
+  return res[0]
+
+}
+
 async function request(path, params) {
     try {
-        const reqString = `${url}/${path}?${params}`
+        let reqString = `${url}/${path}`
+        if (params != null)
+        {
+          reqString += `?${params}`
+        }
         const req = await fetch(reqString)
         const response = await req.json()
         //console.log(`STATUS ${req.status} - ${JSON.stringify(response)}`)
+        if (response.hasOwnProperty("error"))
+        {
+          throw new Error("Bitfinex: ERR_RATE_LIMIT")
+        }
         return response;
     }
     catch (err) {
@@ -72,19 +116,10 @@ async function getOrderBook(ticker, precision, count)
     var bookArray = await request(path, params)
   } catch (err)
   {
-    return new Error(`Request for ${path} with params = ${params} failed. ${err}`)
+    throw new Error(`Request for ${path} with params = ${params} failed. ${err}`)
   }
   
-  const book = toReadableBook(bookArray, rawBook)
-
-  /*console.log("Bids coming here:")
-  console.log(book.bids)
-
-  console.log("Asks coming here")
-  console.log(book.asks)*/
-
-  return book
-
+  return toReadableBook(bookArray, rawBook)
 }
 
 /**
@@ -102,11 +137,6 @@ async function getSymbolNames()
   return symbolArr
 }
 
-async function getCommonSymbolNames()
-{
-  return await getSymbolNames().map(symbolToCommon)
-}
-
 async function getSymbolMap()
 {
   let map = new Map()
@@ -119,7 +149,8 @@ async function getCommonSymbolMap()
 {
   let map = new Map()
   let symbols = await getSymbolNames()
-  symbols.forEach(elem => map.set(symbolToCommon(elem), elem))
+  let translationTable = await getTranslationList()
+  symbols.forEach(elem => map.set(symbolToCommon(elem, translationTable), elem))
   return map
 }
 
@@ -130,11 +161,56 @@ async function getSpotSymbolMap()
   )
 }
 
+async function translatePairs(pairList)
+{
+  let translationMap = await getTranslationMap()
+
+  return Arrays.map(pairList, pair => translatePair(pair, translationMap))
+}
+
+function translatePair(pair, translationMap)
+{
+  let n = pair[0]
+  let d = pair[1]
+  if (translationMap.has(n))
+  {
+    n = translationMap.get(n)
+    //console.log(`${pair[0]} => ${n}`)
+  }
+
+  if (translationMap.has(d))
+  {
+    d = translationMap.get(d)
+    //console.log(`${pair[1]} => ${d}`)
+  }
+  return [n,d]
+}
+
+// This function corrects bitfinex internal representation of cryptos to the general representations
 async function getCommonSpotSymbolMap()
 {
   let map = new Map()
   let symbols = await getSpotTradingPairs()
-  symbols.forEach(elem => map.set(symbolToCommon(elem), elem))
+  let currencyList = await getCurrencyList()  
+  let translationMap = await getTranslationMap()
+
+  for(var symbol of symbols)
+  {
+    let currencyPair = parseCurrency(symbol.substring(1), currencyList)
+    let translatedPair = translatePair(currencyPair, translationMap)
+    let commonSymbol = translatedPair[0] + translatedPair[1]
+    
+    map.set(commonSymbol.toLowerCase(), symbol)
+  }
+
+  return map
+}
+
+async function getCommonSpotSymbolMap2()
+{
+  let map = new Map()
+  let symbols = await getSpotTradingPairs()
+  symbols.forEach(elem => map.set(symbolToCommonOld(elem), elem))
   return map
 }
 
@@ -165,22 +241,46 @@ function symbolsToCommon(bfxSymbols)
   return bfxSymbols.map(elem => elem.substring(1).toLowerCase())
 }
 
-function symbolToCommon(bfxSymbol)
+function symbolToCommonOld(bfxSymbol)
 {
   return bfxSymbol.substring(1).toLowerCase()
 }
 
-/*
-
-(async() => {
-  let x = await getSpotTradingPairs()
-  //let x = await getFuturesPairs()
-  //let x = await getSymbolNames()
-  for(var i = 0; i < x.length; i++)
+function parseCurrency(str, currencyList)
+{
+  // currencyList : list of currencies, eg. BTC, EUR, ETH
+  // O(n) where n = currencyList.length
+  let nominator, denominator;
+  let idx = 0;
+  // find first match
+  for(let symbol of currencyList)
   {
-    console.log(x[i])
+    if (str.search(symbol) == 0)
+    {
+      idx = symbol.length
+      nominator = symbol
+      break
+    }
   }
 
+  let restStr = str.substring(idx)
+  // find first match
+  for(var symbol of currencyList)
+  {
+    if (symbol.length == restStr.length && restStr.endsWith(symbol))
+    {
+      denominator = symbol
+      break
+    }
+  }
+  return [nominator, denominator]
+}
+
+
+/*
+(async() => {
+  console.log(await getTranslationList())
+ 
 })()
 */
 module.exports = {getOrderBook, getSymbolNames, getSpotTradingPairs, getFuturesPairs, symbolsToCommon, getSpotSymbolMap, getCommonSpotSymbolMap}
