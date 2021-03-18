@@ -1,31 +1,4 @@
-/**
- * 
- * @param {Map} S1 
- * @param {Map} S2 
- * 
- * @returns {Array} array of common keys
- */
-function getCommonSymbols(S1, S2)
-{
-  // S1 and S2 are maps
-  let s1Size = S1.size
-  let s2Size = S2.size
 
-  let smallestMap = s1Size < s2Size ? S1 : S2
-  let biggestMap = s1Size < s2Size ? S2 : S1
-  let intersection = new Array()
-
-  for (let key of smallestMap.keys())
-  {
-    if (biggestMap.has(key))
-    {
-      intersection.push(key)
-    }
-  }
-
-  return intersection
-}
-// TODO: get common symbols but with variable number of maps
 
 function triangleArb()
 {
@@ -85,4 +58,4 @@ function getProfitFraction(lowestAsk, highestBid, buyFee, sellFee)
   return (sellRate - buyRate) / buyRate
 }
 
-module.exports = {getCommonSymbols, compareBooks}
+module.exports = {compareBooks}
