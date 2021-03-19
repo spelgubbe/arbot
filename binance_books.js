@@ -3,7 +3,7 @@ const binance = new Binance().options({
   APIKEY: 'zg80mN8LCZVJ0vaZSaxXvqtaOystoOOBkJPbhqCE82qkfGIXmwDcJdYI5AQf6opL',
   APISECRET: 'a17Fec1O9bdgEJd5KdFfNXaOskh0SAvt36rE5wMHe99g8SQsbQaBC9pUYqC6faBq'
 })
-// testnet api key
+// testnet api key, should ofc be in a env file
 
 // future feature...
 //const knownDenominators = ["USD", "USDT", "EUR", "EURT", "BTC", "ETH", "BNB"]
@@ -52,6 +52,10 @@ async function getOrderBook(ticker)
   {
     bids.push({price: Number(price), amount})
   }
+
+  // Sort bids so that highest bid is first, bids[0] = highest bid
+  // Descending order
+  bids.sort((e1,e2) => e2.price - e1.price)
   
   return {asks, bids}
 }

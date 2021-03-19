@@ -94,7 +94,9 @@ function toReadableBook(bookArray, rawBook = false)
       asks.push(bookEntry)
     }
   });
-
+  
+  // Sort bids in descending order, so that bids[0] = highest bid
+  bids.sort((e1,e2) => e2.price - e1.price)
   return {bids, asks};
   }
   
@@ -128,13 +130,79 @@ async function getOrderBook(ticker, precision, count)
  */
 async function getSymbolNames()
 {
+  let tickers = await getAllTickers()
+  let symbolArr = tickers.map(elem => elem[0])
+  return symbolArr
+}
+
+/**
+ * 
+ * @returns {Array<Object>}
+ */
+async function getAllTickers()
+{
+
+  /*
+  Ticker element for BTCUSD (trading pair)
+
+  0	"tBTCUSD"           SYMBOL
+  1	57319               BID
+  2	7.60976982          BID_SIZE
+  3	57334               ASK
+  4	26.951948599999998  ASK_SIZE
+  5	-705                DAILY_CHANGE
+  6	-0.0121             DAILY_CHANGE_RELATIVE
+  7	57320               LAST_PRICE
+  8	8612.7437958        VOLUME
+  9	60190               HIGH
+  10 57255              LOW
+
+  */
+
   const pathParams = 'tickers'
   const queryParams = 'symbols=ALL'
   let tickerArr = await request(pathParams, queryParams)
+  return tickerArr
+}
 
-  let symbolArr = tickerArr.map(elem => elem[0])
-  
-  return symbolArr
+/**
+ * Get the highest bid and the lowest ask from a Bitfinex ticker
+ * @param {Array<Object>} ticker 
+ * @returns {Array<Number>} Array of best [bid, ask]
+ */
+function getBidAndAsk(ticker)
+{
+  const bid = ticker[1]
+  const ask = ticker[3]
+  return {bid, ask}
+}
+
+/**
+ * 
+ * @param {Array<Object>} tickers 
+ * @returns {Array<Object>}
+ */
+async function getBestBidsAndAsks(tickers)
+{
+  const tickers = await getAllTickers()
+  return tickers.map(elem => [elem[0], getBidAndAsk(elem)])
+}
+
+/**
+ * Untested
+ * @param {Array<string>} symbols 
+ * @returns {Array<Object>} tickers
+ */
+async function getTickers(symbols)
+{
+  const pathParams = 'tickers'
+  let queryParams = 'symbols='
+  const commaSeparatedTickerString = symbols.join(',')
+  queryParams += commaSeparatedTickerString
+  console.log(queryParams)
+  let tickerArr = await request(pathParams, queryParams)
+
+  return tickerArr
 }
 
 async function getSymbolMap()
