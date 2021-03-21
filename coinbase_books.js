@@ -95,6 +95,27 @@ async function getBestBidAsk(id)
 
 }
 
+async function getBestBidAsk(id)
+{
+  /*
+  {
+    "trade_id": 4729088,
+    "price": "333.99",
+    "size": "0.193",
+    "bid": "333.98",
+    "ask": "333.99",
+    "volume": "5957.11914015",
+    "time": "2015-11-14T20:46:03.511254Z"
+  }
+  */
+  let ticker = await client.rest.product.getProductTicker(id)
+
+  let bid = Number(ticker["bid"])
+  let ask = Number(ticker["ask"])
+  let internalTimestamp = ticker["time"]
+  return {bid, ask}
+}
+
 // orderbook has levels on coinbase pro... 3 levels
 async function getOrderBook(id)
 {
@@ -108,7 +129,9 @@ async function getOrderBook(id)
   // If 50 fake bids/asks are on top, the approach of only picking the "best" ones might not work
   // For example 50x0.000001 bids/asks
   // However for arb purposes getting full book is wasteful
+
   let orderbook = await client.rest.product.getProductOrderBook(id, {level:OrderBookLevel.TOP_50_BIDS_AND_ASKS})
+
   // Orderbook from coinbase is on the form {bids: [[e0, e1, e2], ...], asks: [[e0, e1, e2], ...]}
   // 
 
@@ -135,8 +158,9 @@ async function getOrderBook(id)
     bids.push(orderEntry)
   })
 
-  // sort bids in ascending order so first entry has the lowest bid (like binance and bitfinex)
-  bids.sort((e1,e2) => e1.price - e2.price)
+  // Don't sort anymore
+  // bids[0] = highest bid, asks[0] = lowest ask. This makes more sense
+  // bids.sort((e1,e2) => e1.price - e2.price)
 
   return {bids, asks}
 }
@@ -149,11 +173,12 @@ async function test()
   console.log(await getCommonSpotSymbolMap())
   console.log(await getOrderBook("ETH-EUR"))
   console.log(await getBestBidAsk("ETH-EUR"))
+  console.log(await getBestBidAsk("ETH-EUR"))
   
 }
 
 test()
-
 */
+
 
 module.exports = {getOrderBook, getBestBidAsk, getCommonSpotSymbolMap}
