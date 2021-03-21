@@ -25,6 +25,28 @@ function getCommonSymbolsList(S1, S2)
 
   return intersection
 }
+
+/**
+ * 
+ * @param  {Object[]} lst 
+ */
+function getAllPairs(lst)
+{
+  //console.log(lst)
+  let pairsArr = new Array()
+  for(var i = 0; i < lst.length; i++)
+  {
+    for(var j = i+1; j < lst.length; j++)
+    {
+      // assert i != j && j > i
+      // for each pair (i,j)
+      //var isect = getSymbolSetIntersection(lst[i], lst[j])
+      pairsArr.push([lst[i], lst[j]])
+    }
+  }
+  return pairsArr
+}
+
 // TODO: get common symbols but with variable number of maps
 // TODO: move these functions out of arb.js
 
@@ -63,4 +85,12 @@ function getSymbolSetIntersection(S1, S2)
   return newSet
 }
 
-module.exports = {getCommonSymbolsList, getSymbolSetUnion, getSymbolSetIntersection}
+/*
+async function test()
+{
+  let arr = ["a","b","c"]
+  getAllSymbolIntersections(arr)
+}
+test()
+*/
+module.exports = {getCommonSymbolsList, getSymbolSetUnion, getSymbolSetIntersection, getAllPairs}
