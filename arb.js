@@ -1,8 +1,23 @@
 
 
-function triangleArb()
+function triangleArb(allPairs)
 {
-  // TODO:
+  // TODO: The idea here is to look at all pairs for a currency. Eg. ETH-USD, ETH-EUR, ETH-BTC
+  // If ETH-BTC price is > ETH-USD/BTC-USD then:
+  //    ETH can be sold for BTC, then BTC is sold to USD, then USD is sold for ETH
+  // It's not expected that this happens on a high liquidity exchange
+  // On lower liquidity exchanges price may be moved enough to make such a deal profitable
+
+  // The function could return a fraction which represents profit
+  // and a description of how to perform the trade, eg. ETH->BTC->USD->ETH
+  // In addition, the upper/lower limits for the execution prices of each trade need to be returned too
+  // The books need to be checked simultaneously or already be up to date
+
+  // (out of scope for this function)
+  // Dealing with a failed arbitrage attempt has to be done too, if orders are pulled 
+  // However, keeping track of the age of an order could help with this
+  // An old order could be expected to have a higher probability of remaining while the order is executed
+  // Remembering best bids and asks and timestamping them, or timestamping order-ids could help with this
 }
 
 // Another form of arb is having an order in the book ready
@@ -83,4 +98,4 @@ function getProfitFraction(lowestAsk, highestBid, buyFee, sellFee)
   return (sellRate - buyRate) / buyRate
 }
 
-module.exports = {compareBooks}
+module.exports = {compareBooks, compareBestBidAsk}
