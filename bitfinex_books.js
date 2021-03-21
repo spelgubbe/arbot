@@ -184,8 +184,8 @@ function getBidAndAsk(ticker)
  */
 async function getBestBidsAndAsks(tickers)
 {
-  const tickers = await getAllTickers()
-  return tickers.map(elem => [elem[0], getBidAndAsk(elem)])
+  const t = await getAllTickers()
+  return t.map(elem => [elem[0], getBidAndAsk(elem)])
 }
 
 /**

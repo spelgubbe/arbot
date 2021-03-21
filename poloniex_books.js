@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 
 const url = "https://poloniex.com/"
 
+const customCurrencyMapping = {"STR": "XLM"}
 
 async function request(path, params) {
     try {
@@ -40,9 +41,12 @@ async function getSupportedCurrencies()
 async function getOrderBook(symbol, depth = 50) // depth=50 is default for Poloniex
 {
   // https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_ETH&depth=10
-  // Orderbooks:
+  // Orderbooks from Poloniex API:
   // Bids sorted highest to lowest
   // Asks sorted lowest to highest
+  // bids[0] = highest bid, asks[0] = lowest ask
+  // No need to sort
+
   const path = 'public'
   let queryParams = 'command=returnOrderBook'
   queryParams += `&currencyPair=${symbol}&depth=${depth}`
@@ -55,14 +59,9 @@ async function getOrderBook(symbol, depth = 50) // depth=50 is default for Polon
   })
   bookObj.bids.forEach(priceAmountPair => {
     bids.push({price: Number(priceAmountPair[0]), amount: priceAmountPair[1]})
-    //console.log(priceAmountPair[0])
-    //console.log(Number(priceAmountPair[0]))
   })
 
-  const book = {asks, bids}
-  //console.log(book)
-
-  return book
+  return {asks, bids}
 }
 
 /**
@@ -79,11 +78,21 @@ function symbolToCommon(symbol)
   {
     throw new Error(`Failed parsing Poloniex symbol (${symbol})`)
   }
-  const denominator = symbol.substring(0, underscorePos)
+  let denominator = symbol.substring(0, underscorePos)
   // Eg. USD_BTC => nominator is BTC
-  const nominator = symbol.substring(underscorePos+1)
+  let nominator = symbol.substring(underscorePos+1)
 
-  return nominator+denominator
+  if (denominator in customCurrencyMapping)
+  {
+    denominator = customCurrencyMapping[denominator]
+  }
+
+  if (nominator in customCurrencyMapping)
+  {
+    nominator = customCurrencyMapping[nominator]
+  }
+
+  return nominator.toLowerCase()+denominator.toLowerCase()
   
 }
 /**
@@ -191,6 +200,7 @@ async function getCommonSpotSymbolMap()
   return map
 }
 
+/*
 async function test()
 {
   let symbols = await getSymbolNames()
@@ -201,7 +211,7 @@ async function test()
 }
 
 test()
-
+*/
 // TODO: filter out BULL/BEAR contracts
 
 //module.exports = {getOrderBook, symbolsToCommon, getSpotTradingPairs, getBestBidAsk, getSpotTickers, getSpotSymbolMap, getCommonSpotSymbolMap}

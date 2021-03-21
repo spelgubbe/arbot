@@ -80,10 +80,9 @@ async function getSpotTickers()
 async function getSpotSymbolList()
 {
   // BULL/BEAR contracts are listed in binance.prices(), not really a problem
-  // except that they cant be arbed probably (so have to be excluded)
+  // except that they cant be arbed probably (so they have to be excluded)
   let tickerObj = await binance.prices()
   return Object.keys(tickerObj)
-  //console.log(binance_prices)
 }
 
 async function getSpotSymbolMap()
