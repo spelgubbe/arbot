@@ -1,0 +1,21 @@
+{
+  "name": "arbbot",
+  "version": "1.0.0",
+  "description": "arbitrage bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jakob Kratz",
+  "license": "ISC",
+  "dependencies": {
+    "bitfinex-api-node": "^5.0.0",
+    "coinbase-pro-node": "^2.18.1",
+    "crypto-js": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "jest": "^27.0.3",
+    "node-binance-api": "^0.12.5",
+    "node-fetch": "^2.6.1"
+  }
+}
