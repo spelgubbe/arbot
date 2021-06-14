@@ -103,6 +103,13 @@ class Exchange {
     return this.getCommonSpotSymbolMap().get(symbol)
   }
 
+  getTickersCopy()
+  {
+    // should this really be a map?
+    // probably do a deep copy of object instead
+    return new Map(Object.entries(this.tickers)) // might be too shallow copy
+  }
+
 }
 
 module.exports = {Exchange}
