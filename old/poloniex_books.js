@@ -1,6 +1,7 @@
 const fetch = require('node-fetch')
 
 const url = "https://poloniex.com/"
+const identifier = "Poloniex"
 
 const customCurrencyMapping = {"STR": "XLM"}
 
@@ -11,6 +12,7 @@ async function request(path, params) {
         {
           reqString += `?${params}`
         }
+        //console.log(reqString)
         const req = await fetch(reqString)
         const response = await req.json()
         return response;
@@ -136,10 +138,8 @@ async function getAllTickers()
   const path = 'public'
   const queryParams = 'command=returnTicker'
   let tickerObj = await request(path, queryParams)
-  //console.log(tickerObj)
 
   return tickerObj
-
 }
 
 /**
@@ -200,19 +200,6 @@ async function getCommonSpotSymbolMap()
   return map
 }
 
-/*
-async function test()
-{
-  let symbols = await getSymbolNames()
-  //symbols.forEach(val => console.log(val))
-  //console.log(await getOrderBook("USDT_BTC", 50))
-  //let supported = await getSupportedCurrencies()
-  //Object.keys(supported).forEach(val=>console.log(val))
-}
-
-test()
-*/
 // TODO: filter out BULL/BEAR contracts
 
-//module.exports = {getOrderBook, symbolsToCommon, getSpotTradingPairs, getBestBidAsk, getSpotTickers, getSpotSymbolMap, getCommonSpotSymbolMap}
-module.exports = {getOrderBook, getSymbolNames, getSpotTradingPairs, getCommonSpotSymbolMap}
+module.exports = {identifier, getOrderBook, getSymbolNames, getSpotTradingPairs, getCommonSpotSymbolMap}
