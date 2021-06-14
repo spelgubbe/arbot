@@ -1,5 +1,4 @@
 
-
 function triangleArb(allPairs)
 {
   // TODO: The idea here is to look at all pairs for a currency. Eg. ETH-USD, ETH-EUR, ETH-BTC
@@ -82,6 +81,32 @@ function compareBestBidAsk(bidask1, bidask2, fee1, fee2)
   return [false, buy1sell2, buy2sell1]
 
 }
+/**
+ * 
+ * @param {Object} ticker1 Ticker object for exchange 1
+ * @param {Object} ticker2 Ticker object for exchange 2
+ * @param {Number} fee1 Fee on exchange 1
+ * @param {Number} fee2 Fee on exchange 2
+ * @returns {Array<Number>} Array with two numbers, representing profits for buying/selling into ticker1/ticker2
+ */
+function calcTradeProfit(ticker1, ticker2, fee1, fee2)
+{
+  const feeMult1 = 1+fee1
+  const feeMult2 = 1+fee2
+
+  const highestBid1 = ticker1.bid
+  const highestBid2 = ticker2.bid
+
+  const lowestAsk1 = ticker1.ask
+  const lowestAsk2 = ticker2.ask
+
+  const buy1sell2 = getProfitFraction(lowestAsk1, highestBid2, feeMult1, feeMult2)
+  const buy2sell1 = getProfitFraction(lowestAsk2, highestBid1, feeMult2, feeMult1)
+
+  return [buy1sell2, buy2sell1]
+
+
+}
 
 /**
  * 
@@ -100,4 +125,4 @@ function getProfitFraction(buyPrice, sellPrice, buyFee, sellFee)
   return (sellRate - buyRate) / buyRate
 }
 
-module.exports = {compareBooks, compareBestBidAsk}
+module.exports = {compareBooks, compareBestBidAsk, calcTradeProfit}
