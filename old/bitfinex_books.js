@@ -110,7 +110,7 @@ function toReadableBook(bookArray, rawBook = false)
 * 
 * @returns { bids: [ {price, amount}, ... ], asks: [ {price, amount}, ... ] }
 */
-async function getOrderBook(ticker, precision, count)
+async function getOrderBook(ticker, precision = "R0", count = 5)
 {
   let rawBook = precision == "R0"
   let path = `book/${ticker}/${precision}`
