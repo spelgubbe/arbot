@@ -11,14 +11,14 @@ const customCurrencyMapping = {"REP2": "REP"}
 class BitfinexExchange extends Exchange
 {
   constructor(makerFee, takerFee){
-      super("Bitfinex", makerFee, takerFee)
-      this.invertedSymbolMap = {} // use inverted symbol map to map internal symbol => common symbol
-    }
+    super("Bitfinex", makerFee, takerFee)
+    this.invertedSymbolMap = {} // use inverted symbol map to map internal symbol => common symbol
+  }
   
   async getTranslationList()
   {
-    const res = await this.request(symbolMapPath)
-    return res[0]
+    const [res] = await this.request(symbolMapPath)
+    return res
   }
 
   async getTranslationMap()
@@ -336,13 +336,4 @@ class BitfinexExchange extends Exchange
 
 }
 
-async function test()
-{
-  let exchange = new BitfinexExchange(0.0075, 0.0075)
-  await exchange.setupSymbolMap()
-  console.log(await exchange.getAllTickers())
-  await exchange.updateTickers()
-  console.log(await exchange.getAllTickers())
-}
-
-test()
+module.exports = {BitfinexExchange}
