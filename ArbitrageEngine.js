@@ -7,7 +7,6 @@ class ArbitrageEngine
 {
   constructor()
   {
-    // instead construct from array of exchanges in the future
     this.exchanges = [
       new BitfinexExchange(0.0075, 0.0075),
       new BinanceExchange(0.0075, 0.0075)
@@ -34,7 +33,6 @@ class ArbitrageEngine
     
   }
   
-  // maybe should be in this class
   /**
    * 
    * @param {Array<Exchange>} pairsArr Exchange pairs
