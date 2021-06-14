@@ -5,7 +5,7 @@
  * 
  * @returns {Array} array of common keys
  */
-function getCommonSymbolsList(S1, S2)
+function getCommonKeysList(S1, S2)
 {
   // S1 and S2 are maps
   let s1Size = S1.size
@@ -58,7 +58,7 @@ function getAllPairs(lst)
  * 
  * @returns {Set<string>} Union of S1 and S2
  */
-function getSymbolSetUnion(S1, S2)
+function getSetUnion(S1, S2)
 {
   let newSet = new Set()
   S1.forEach(val => newSet.add(val))
@@ -74,7 +74,7 @@ function getSymbolSetUnion(S1, S2)
  * 
  * @returns {Set<string>} Intersection of S1 and S2
  */
-function getSymbolSetIntersection(S1, S2)
+function getSetIntersection(S1, S2)
 {
   let newSet = new Set()
   S1.forEach(elem => {
@@ -93,4 +93,4 @@ async function test()
 }
 test()
 */
-module.exports = {getCommonSymbolsList, getSymbolSetUnion, getSymbolSetIntersection, getAllPairs}
+module.exports = {getCommonKeysList, getSetUnion, getSetIntersection, getAllPairs}
