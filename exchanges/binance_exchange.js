@@ -3,6 +3,10 @@ const binanceAPI = new BinanceAPI()
 const {Exchange} = require('./exchange')
 class BinanceExchange extends Exchange
 {
+  constructor(makerFee, takerFee){
+    super("Binance", makerFee, takerFee)
+  }
+
   async getBestBidAskFromBook(symbol)
   {
     return await new Promise((resolve, reject) =>
@@ -120,12 +124,4 @@ class BinanceExchange extends Exchange
   }
 }
 
-
-async function test()
-{
-  let exchange = new BinanceExchange("Binance", 0.0075, 0.0075)
-  await exchange.setupSymbolMap()
-  console.log(await exchange.getAllTickers())
-}
-
-test()
+module.exports = {BinanceExchange}
