@@ -1,6 +1,8 @@
 const {CoinbasePro, OrderBookLevel} = require('coinbase-pro-node');
 const client = new CoinbasePro();
 
+const identifier = "Coinbase Pro"
+
 async function getProductSymbols()
 {
   /* client.rest.product.getProducts() returns an array: Example of one element, 
