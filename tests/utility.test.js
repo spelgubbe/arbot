@@ -6,7 +6,7 @@ test('check common symbols', () => {
 
 	let expected = [] // get example from data
 	
-	let result = utility.getCommonSymbolsList(m1, m2)
+	let result = utility.getCommonKeysList(m1, m2)
 
 	// sort to not make order matter
 	expect(result.sort()).toEqual(expected.sort())
@@ -18,7 +18,7 @@ test('check union', () => {
 
 	let expected = new Set(["a", "b", "c", "d", "e", "z"])
 
-	let result = utility.getSymbolSetUnion(s1, s2)
+	let result = utility.getSetUnion(s1, s2)
 
 	expect(result).toEqual(expected)
 
@@ -30,7 +30,7 @@ test('check intersection', () => {
 
 	let expected = new Set(["a", "b", "c"])
 
-	let result = utility.getSymbolSetIntersection(s1, s2)
+	let result = utility.getSetIntersection(s1, s2)
 
 	expect(result).toEqual(expected)
 })
